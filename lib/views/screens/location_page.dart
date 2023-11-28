@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:weatherappchallenge/base/utils.dart';
 import 'package:weatherappchallenge/controller/controller.dart';
 import 'package:weatherappchallenge/model/weather_model.dart';
-import 'package:weatherappchallenge/views/screens/home_page.dart';
+import 'package:weatherappchallenge/views/screens/city_page.dart';
 import 'package:weatherappchallenge/views/widgets/city_cards.dart';
 
 class Locations extends StatefulWidget {
@@ -15,11 +15,12 @@ class Locations extends StatefulWidget {
 
 class _LocationsState extends Utils<Locations> {
   TextEditingController cityController = TextEditingController();
-  @override
   Controller controller = Get.put(Controller());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        //Page name and icon
         appBar: AppBar(
           title: Row(
             children: [
@@ -37,28 +38,41 @@ class _LocationsState extends Utils<Locations> {
             ],
           ),
         ),
+
+        //Textfield and button for add new city
         floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Container(
+            SizedBox(
               width: dynamicWidth(0.75),
               child: TextField(
                 controller: cityController,
+                decoration: InputDecoration(
+                    hintText: "Enter a city name",
+                    filled: true,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15))),
               ),
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.add_location,
-                color: Colors.white,
+            //AddNewCity Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    controller.addNewCity(cityController.text);
+                  });
+                  cityController.clear();
+                },
+                child: const CircleAvatar(
+                  child: Icon(Icons.add_location_alt_outlined),
+                ),
               ),
-              onPressed: () {
-                controller.addNewCity(cityController.text);
-                cityController.clear();
-              },
-            )
+            ),
           ],
         ),
+
+        //City Card Builder
         body: Obx(
           () => ListView.builder(
               itemCount: controller.cityList.length,
@@ -73,12 +87,14 @@ class _LocationsState extends Utils<Locations> {
                       if (snapshot.hasError) {
                         return Center(child: Text(snapshot.error.toString()));
                       }
+                      //we take 5 day's data as a list
                       List<WeatherModel>? weatherList = snapshot.data;
+                      //First object of this list is contains current day's data
                       WeatherModel currentWeather = weatherList![0];
 
-                      return GestureDetector(
+                      return InkWell(
                           onTap: () {
-                            Get.to(HomePage(weatherList: weatherList));
+                            Get.to(CityPage(weatherList: weatherList));
                           },
                           child: CityCard(weatherData: currentWeather));
                     });

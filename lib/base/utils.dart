@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:weatherappchallenge/controller/controller.dart';
 
 abstract class Utils<T extends StatefulWidget> extends State<T> {
-  Controller controller = Get.put(Controller());
+  List<String> cityPhotoList = [
+    "Rome",
+    "Barcelona",
+    "New York",
+    "Istanbul",
+    "Bangkok",
+    "Beijig",
+    "Dubai",
+    "London",
+    "Minsk",
+    "Paris"
+  ];
 
   ThemeData get themeData => Theme.of(context);
 
@@ -22,12 +31,6 @@ abstract class Utils<T extends StatefulWidget> extends State<T> {
   String formattedHour(String date) =>
       DateFormat('hh:mm a').format(DateTime.parse(date));
 
-  Image getBackgroundImage(String city) => Image.asset(
-        'assets/images/${city}.png',
-        fit: BoxFit.cover,
-      );
-
-  initCityList() {
-    controller.cityList = controller.storage.read("cityList");
-  }
+  Image getBackgroundImage(String city) =>
+      Image.asset('assets/images/$city.png', fit: BoxFit.cover);
 }

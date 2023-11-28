@@ -8,7 +8,8 @@ import 'package:get_storage/get_storage.dart';
 class Controller extends GetxController {
   String url(String city) =>
       'https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=75bbece187da05fa4343b25bdb8521fb&units=metric';
-  List cityList = ['Paris', 'London'].obs;
+
+  List cityList = ['Istanbul', 'Rome'].obs;
 
   GetStorage storage = GetStorage();
 
@@ -22,12 +23,23 @@ class Controller extends GetxController {
       if (cityList.contains(city)) {
         Get.snackbar("Oops!", "City already in list.");
       } else {
-        cityList.add(city);
+        Map<String, dynamic> parsedData = jsonDecode(data.body);
+
+        cityList.add(parsedData["city"]["name"]);
         storage.write("cityList", cityList);
       }
     } else {
-      Get.snackbar("Oops!", "Something went wrong please try again");
+      Get.snackbar("Oops!", "Something went wrong please try again.");
     }
+  }
+
+  void deleteCity(String city) {
+    cityList.remove(city);
+    storage.write("cityList", cityList);
+  }
+
+  void loadCityList() {
+    cityList = storage.read("cityList");
   }
 
   Future getData(String city) async {

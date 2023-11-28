@@ -16,8 +16,8 @@ class _WeatherCardState extends Utils<WeatherCard> {
   Widget build(BuildContext context) {
     List<WeatherModel> weatherList = widget.weatherList;
     return Container(
-        height: MediaQuery.of(context).size.height * 0.2,
-        width: MediaQuery.of(context).size.width * 0.95,
+        height: dynamicHeight(0.2),
+        width: dynamicWidth(0.95),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             color: Colors.black.withOpacity(0.34)),
@@ -27,29 +27,29 @@ class _WeatherCardState extends Utils<WeatherCard> {
           itemBuilder: (context, index) => Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.03,
-              width: MediaQuery.of(context).size.width * 0.18,
+              height: dynamicHeight(0.03),
+              width: dynamicWidth(0.18),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    formattedDateForDailyCards(weatherList[index].date),
-                    style: Theme.of(context).textTheme.titleMedium,
+                    formattedDateForDailyCards(weatherList[index + 1].date),
+                    style: theme.textTheme.titleMedium,
                   ),
                   SizedBox(
                     height: 50,
                     width: 50,
                     child: WeatherIcon(
-                      icon: weatherList[index].icon.toString(),
+                      icon: weatherList[index + 1].icon.toString(),
                     ),
                   ),
                   Text(
-                    '${weatherList[index].degree.toString()}°C',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    '${weatherList[index + 1].degree.toString()}°C',
+                    style: theme.textTheme.titleMedium,
                   ),
                   Text(
-                    '${weatherList[index].windSpeed.toString()}km/h',
-                    style: Theme.of(context).textTheme.titleSmall,
+                    '${weatherList[index + 1].windSpeed.toString()}km/h',
+                    style: theme.textTheme.titleSmall,
                   )
                 ],
               ),

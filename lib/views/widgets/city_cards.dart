@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/get.dart';
 import 'package:weatherappchallenge/base/utils.dart';
+import 'package:weatherappchallenge/controller/controller.dart';
 import 'package:weatherappchallenge/model/weather_model.dart';
 import 'package:weatherappchallenge/views/widgets/animated_weather_icon.dart';
 
@@ -12,9 +15,27 @@ class CityCard extends StatefulWidget {
 }
 
 class _CityCardState extends Utils<CityCard> {
+  Controller controller = Get.find();
+  void deleteCity() {
+    controller.deleteCity(widget.weatherData.city);
+    print(controller.cityList);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Slidable(
+      endActionPane: ActionPane(motion: ScrollMotion(), children: [
+        SlidableAction(
+          borderRadius: BorderRadius.circular(15),
+          onPressed: (_) {
+            deleteCity();
+          },
+          backgroundColor: Color(0xFFFE4A49),
+          foregroundColor: Colors.white,
+          icon: Icons.delete,
+          label: 'Delete',
+        ),
+      ]),
       child: Column(
         children: [
           Padding(
