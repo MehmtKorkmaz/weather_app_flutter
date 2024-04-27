@@ -1,45 +1,43 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:weatherappchallenge/base/shared_enums.dart';
 import 'dart:convert';
 
-import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+import 'package:weatherappchallenge/controller/shared_manager.dart';
 import 'package:weatherappchallenge/model/weather_model.dart';
-import 'package:get_storage/get_storage.dart';
 
-class Controller extends GetxController {
+class ProviderManager extends ChangeNotifier {
+  List<String> cityList = [];
+
   String url(String city) =>
       'https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=75bbece187da05fa4343b25bdb8521fb&units=metric';
 
-  List cityList = ['Istanbul', 'Rome'].obs;
+  void initCityList() async {
+    cityList = await SharedManager.getStringList(SharedEnum.cityList);
+    notifyListeners();
+    print('cityList' + cityList.toString());
+  }
 
-  GetStorage storage = GetStorage();
-
-  void addNewCity(String city) async {
+  void addNewCity(String city, BuildContext context) async {
     var data = await http.get(Uri.parse(url(city)));
 
     if (city.isEmpty) {
-      Get.snackbar("Oops!", "Please enter a city name.");
+      snackBar(context, "Please enter a city name.");
     }
     if (data.statusCode == 200) {
       if (cityList.contains(city)) {
-        Get.snackbar("Oops!", "City already in list.");
+        snackBar(context, "City already in list.");
       } else {
         Map<String, dynamic> parsedData = jsonDecode(data.body);
 
         cityList.add(parsedData["city"]["name"]);
-        storage.write("cityList", cityList);
+        SharedManager.setStringList(SharedEnum.cityList, cityList);
       }
     } else {
-      Get.snackbar("Oops!", "Something went wrong please try again.");
+      snackBar(context, "Something went wrong please try again.");
     }
-  }
 
-  void deleteCity(String city) {
-    cityList.remove(city);
-    storage.write("cityList", cityList);
-  }
-
-  void loadCityList() {
-    cityList = storage.read("cityList");
+    notifyListeners();
   }
 
   Future getData(String city) async {
@@ -63,5 +61,21 @@ class Controller extends GetxController {
     }
 
     return weatherList;
+  }
+
+  void deleteCity(String city) {
+    cityList.remove(city);
+    SharedManager.setStringList(SharedEnum.cityList, cityList);
+
+    notifyListeners();
+  }
+
+  void snackBar(BuildContext context, String content) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Something went wrong'),
+              content: Text(content),
+            ));
   }
 }

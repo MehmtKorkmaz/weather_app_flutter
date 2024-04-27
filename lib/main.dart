@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:provider/provider.dart';
+import 'package:weatherappchallenge/controller/service.dart';
+import 'package:weatherappchallenge/controller/shared_manager.dart';
 import 'package:weatherappchallenge/views/screens/location_page.dart';
 
 void main() async {
-  await GetStorage.init();
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedManager.init();
+
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider<ProviderManager>(
+        create: (context) => ProviderManager(),
+      )
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -13,7 +23,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         appBarTheme: const AppBarTheme(

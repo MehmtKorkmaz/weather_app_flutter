@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:weatherappchallenge/base/utils.dart';
-import 'package:weatherappchallenge/controller/controller.dart';
+import 'package:weatherappchallenge/controller/service.dart';
 import 'package:weatherappchallenge/model/weather_model.dart';
 import 'package:weatherappchallenge/views/screens/city_page.dart';
 import 'package:weatherappchallenge/views/widgets/city_cards.dart';
@@ -15,7 +15,12 @@ class Locations extends StatefulWidget {
 
 class _LocationsState extends Utils<Locations> {
   TextEditingController cityController = TextEditingController();
-  Controller controller = Get.put(Controller());
+
+  @override
+  void initState() {
+    context.read<ProviderManager>().initCityList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +65,9 @@ class _LocationsState extends Utils<Locations> {
               child: InkWell(
                 onTap: () {
                   setState(() {
-                    controller.addNewCity(cityController.text);
+                    context
+                        .read<ProviderManager>()
+                        .addNewCity(cityController.text, context);
                   });
                   cityController.clear();
                 },
@@ -73,32 +80,37 @@ class _LocationsState extends Utils<Locations> {
         ),
 
         //City Card Builder
-        body: Obx(
-          () => ListView.builder(
-              itemCount: controller.cityList.length,
-              itemBuilder: (context, index) {
-                return FutureBuilder(
-                    future: controller
-                        .dataToWeatherModel(controller.cityList[index]),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (snapshot.hasError) {
-                        return Center(child: Text(snapshot.error.toString()));
-                      }
-                      //we take 5 day's data as a list
-                      List<WeatherModel>? weatherList = snapshot.data;
-                      //First object of this list is contains current day's data
-                      WeatherModel currentWeather = weatherList![0];
+        body: Consumer<ProviderManager>(
+            builder: (context, myProvider, _) => ListView.builder(
+                  itemCount: myProvider.cityList.length,
+                  itemBuilder: (context, index) => FutureBuilder(
+                      future: context
+                          .read<ProviderManager>()
+                          .dataToWeatherModel(myProvider.cityList[index]),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError) {
+                          return Center(child: Text(snapshot.error.toString()));
+                        }
+                        //we take 5 day's data as a list
+                        List<WeatherModel>? weatherList = snapshot.data;
+                        //First object of this list is contains current day's data
+                        WeatherModel currentWeather = weatherList![0];
 
-                      return InkWell(
-                          onTap: () {
-                            Get.to(CityPage(weatherList: weatherList));
-                          },
-                          child: CityCard(weatherData: currentWeather));
-                    });
-              }),
-        ));
+                        return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          CityPage(weatherList: weatherList)));
+                            },
+                            child: CityCard(weatherData: currentWeather));
+                      }),
+                )));
   }
 }
