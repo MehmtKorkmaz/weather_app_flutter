@@ -4,7 +4,7 @@ import 'package:weatherappchallenge/controller/service.dart';
 import 'package:weatherappchallenge/controller/shared_manager.dart';
 import 'package:weatherappchallenge/views/screens/location_page.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedManager.init();
 
